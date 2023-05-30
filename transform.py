@@ -15,8 +15,8 @@ os.mkdir(device.find("name").text)
 os.chdir(device.find("name").text)
 
 for thing in device.findall("./peripherals/peripheral"):
-    name = thing.find("name")
-    f = open(f"{name.text}.py", "w")
+    tname = thing.find("name")
+    f = open(f"{tname.text}.py", "w")
     f.write("import uctypes\n\n")
 
     for cluster in thing.findall("./registers/cluster"):
@@ -47,8 +47,8 @@ for thing in device.findall("./peripherals/peripheral"):
 
         f.write("}\n\n")
 
-    f.write("%s = {\n" % name.text)
-    known[name.text] = thing
+    f.write("%s = {\n" % tname.text)
+    known[tname.text] = thing
     if thing.get("derivedFrom"):
         assert thing.get("derivedFrom") in known
         thing = known[thing.get("derivedFrom")]
