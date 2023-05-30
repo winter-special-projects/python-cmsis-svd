@@ -47,7 +47,6 @@ for thing in device.findall("./peripherals/peripheral"):
 
         f.write("}\n\n")
 
-
     f.write("%s = {\n" % name.text)
     known[name.text] = thing
     if thing.get("derivedFrom"):
@@ -69,6 +68,15 @@ for thing in device.findall("./peripherals/peripheral"):
             )
 
     for cluster in thing.findall("./registers/cluster"):
+        cname = cluster.find("name").text
+        cdim = cluster.find("dim")
+
+        if cdim:
+            offset = cluster.find("addressOffset").text
+            text = cname.replace("[%s]", "")
+            f.write(f'    "{text}": ({offset} | uctypes.ARRAY, {dim.text} | cname),\n')
+            continue
+
         for register in cluster.findall("register"):
             name = register.find("name")
             dim = register.find("dim")
