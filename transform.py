@@ -18,6 +18,36 @@ for thing in device.findall("./peripherals/peripheral"):
     name = thing.find("name")
     f = open(f"{name.text}.py", "w")
     f.write("import uctypes\n\n")
+
+    for cluster in thing.findall("./registers/cluster"):
+        cname = cluster.find("name").text
+        cdim = cluster.find("dim")
+
+        if cdim is None:
+            continue
+
+        assert "[%s]" in cname
+        cname = cname.replace("[%s]", "")
+        f.write("%s = {\n" % cname)
+
+        for register in cluster.findall("register"):
+            name = register.find("name")
+            dim = register.find("dim")
+            size = register.find("size").text
+            offset = register.find("addressOffset").text
+            if dim is None:
+                assert not "%s" in name.text
+                f.write(f'    "{name.text}": {offset} | uctypes.UINT{size},\n')
+            else:
+                assert "%s" in name.text
+                text = name.text.replace("[%s]", "")
+                f.write(
+                    f'    "{text}": ({offset} | uctypes.ARRAY, {dim.text} | uctypes.UINT{size}),\n'
+                )
+
+        f.write("}\n\n")
+
+
     f.write("%s = {\n" % name.text)
     known[name.text] = thing
     if thing.get("derivedFrom"):
