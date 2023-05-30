@@ -49,9 +49,11 @@ for thing in device.findall("./peripherals/peripheral"):
 
     f.write("%s = {\n" % tname.text)
     known[tname.text] = thing
+
     if thing.get("derivedFrom"):
         assert thing.get("derivedFrom") in known
         thing = known[thing.get("derivedFrom")]
+
     for register in thing.findall("./registers/register"):
         name = register.find("name")
         dim = register.find("dim")
@@ -71,10 +73,10 @@ for thing in device.findall("./peripherals/peripheral"):
         cname = cluster.find("name").text
         cdim = cluster.find("dim")
 
-        if cdim:
+        if not cdim is None:
             offset = cluster.find("addressOffset").text
             text = cname.replace("[%s]", "")
-            f.write(f'    "{text}": ({offset} | uctypes.ARRAY, {dim.text} | cname),\n')
+            f.write(f'    "{text}": ({offset} | uctypes.ARRAY, {cdim.text}, {text}),\n')
             continue
 
         for register in cluster.findall("register"):
