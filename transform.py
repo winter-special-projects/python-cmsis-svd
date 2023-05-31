@@ -60,7 +60,10 @@ for thing in device.findall("./peripherals/peripheral"):
     for register in thing.findall("./registers/register"):
         name = register.find("name")
         dim = register.find("dim")
-        size = register.find("size").text
+        try:
+            size = register.find("size").text
+        except AttributeError:
+            size = "32"
         offset = register.find("addressOffset").text
         if dim is None:
             assert not "%s" in name.text
