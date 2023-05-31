@@ -8,9 +8,6 @@ device = tree.getroot()
 
 known = {}
 
-# TODO
-# consider "./registers/cluster"
-
 os.mkdir(device.find("name").text)
 os.chdir(device.find("name").text)
 
